@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>MultiBrowser Simulator</title>
+  <link rel="stylesheet" href="toolbar.css">
+</head>
+<body>
+  <!-- Top Toolbar -->
+  <div id="app-toolbar">
+    <div class="toolbar-group">
+      <label>URL:</label>
+      <input type="text" id="url-input" placeholder="https://example.com" style="width:300px">
+      <button id="go-btn">Go</button>
+    </div>
+    <div class="toolbar-group">
+      <label>Rows:</label>
+      <input type="number" id="rows-input" min="1" max="10" value="2" style="width:50px">
+      <label>Cols:</label>
+      <input type="number" id="cols-input" min="1" max="10" value="2" style="width:50px">
+      <button id="grid-btn">Apply</button>
+    </div>
+    <div class="toolbar-group">
+      <label>
+        <input type="checkbox" id="float-toggle"> Floating Toolbar
+      </label>
+    </div>
+    <div class="toolbar-group">
+      <button id="settings-btn">⚙ Settings</button>
+    </div>
+  </div>
+
+  <!-- Scrollable Grid Area (invisible to user - just captures scroll) -->
+  <div id="grid-scroll">
+    <div id="grid-content"></div>
+  </div>
+
+  <!-- Settings Dialog -->
+  <div id="settings-dialog" class="dialog hidden">
+    <div class="dialog-content">
+      <h3>Settings</h3>
+      <div class="form-row">
+        <label>Min Grid Width:</label>
+        <input type="number" id="min-width-input" min="200" value="400" style="width:80px">
+      </div>
+      <div class="form-row">
+        <label>Min Grid Height:</label>
+        <input type="number" id="min-height-input" min="150" value="300" style="width:80px">
+      </div>
+      <div class="dialog-buttons">
+        <button id="settings-save">Save</button>
+        <button id="settings-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Storage Viewer Dialog -->
+  <div id="storage-dialog" class="dialog hidden">
+    <div class="dialog-content" style="width:700px;max-height:80vh;overflow:auto;">
+      <h3 id="storage-title">Storage Viewer</h3>
+      <div id="storage-body"></div>
+      <div class="dialog-buttons">
+        <button id="storage-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="toolbar.js"></script>
+</body>
+</html>
