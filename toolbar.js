@@ -56,11 +56,13 @@ floatToggle.addEventListener("change", () => {
 settingsBtn.addEventListener("click", () => {
   minWidthInput.value = minGridWidth;
   minHeightInput.value = minGridHeight;
+  api.hideViews();
   settingsDialog.classList.remove("hidden");
 });
 
 settingsCancel.addEventListener("click", () => {
   settingsDialog.classList.add("hidden");
+  api.showViews();
 });
 
 settingsSave.addEventListener("click", () => {
@@ -68,11 +70,13 @@ settingsSave.addEventListener("click", () => {
   minGridHeight = Math.max(150, parseInt(minHeightInput.value) || 300);
   api.setMinSize(minGridWidth, minGridHeight);
   settingsDialog.classList.add("hidden");
+  api.showViews();
 });
 
 // ── Storage Viewer Dialog ─────────────────────
 storageClose.addEventListener("click", () => {
   storageDialog.classList.add("hidden");
+  api.showViews();
 });
 
 function showStorage(data) {
@@ -120,6 +124,7 @@ function showStorage(data) {
   html += `</div>`;
 
   storageBody.innerHTML = html;
+  api.hideViews();
   storageDialog.classList.remove("hidden");
 }
 

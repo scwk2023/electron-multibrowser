@@ -405,6 +405,16 @@ ipcMain.handle("scroll-changed", async (e, sx, sy) => {
   }
 });
 
+ipcMain.handle("hide-views", async () => {
+  for (const view of cellViews) {
+    view.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+  }
+});
+
+ipcMain.handle("show-views", async () => {
+  layoutGrid();
+});
+
 // Storage viewer from cell preload
 ipcMain.on("show-storage-viewer", (e, data) => {
   if (data) openStorageViewer(data);

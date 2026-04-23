@@ -11,4 +11,6 @@ contextBridge.exposeInMainWorld("__toolbarAPI", {
   onGridSize: (cb) => ipcRenderer.on("grid-size", (e, v) => cb(v)),
   onWindowResized: (cb) => ipcRenderer.on("window-resized", () => cb()),
   sendScroll: (sx, sy) => ipcRenderer.invoke("scroll-changed", sx, sy),
+  hideViews: () => ipcRenderer.invoke("hide-views"),
+  showViews: () => ipcRenderer.invoke("show-views"),
 });
