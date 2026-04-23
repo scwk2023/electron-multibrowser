@@ -11,6 +11,8 @@ contextBridge.exposeInMainWorld("__mbCellAPI", {
     myCol = c;
   },
   refresh: () => ipcRenderer.invoke("refresh-cell", myRow, myCol),
+  goBack: () => ipcRenderer.invoke("go-back", myRow, myCol),
+  goForward: () => ipcRenderer.invoke("go-forward", myRow, myCol),
   viewStorage: () => ipcRenderer.invoke("get-storage", myRow, myCol).then((data) => {
     ipcRenderer.send("show-storage-viewer", data);
   }),

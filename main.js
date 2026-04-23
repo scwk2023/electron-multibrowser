@@ -16,6 +16,9 @@ let minGridHeight = 300;
 let showFloatingToolbar = false;
 const cellViews = []; // flat array [row*cols+col] = BrowserView
 const TOOLBAR_HEIGHT = 48;
+const BORDER_GAP = 1;
+
+let lastUrl = "";
 
 // ── Helpers ────────────────────────────────────────────
 function cellId(r, c) {
@@ -74,12 +77,20 @@ const floatingToolbarJS = (r, c) => `
     if (document.getElementById('__mb_float_toolbar')) return;
     const tb = document.createElement('div');
     tb.id = '__mb_float_toolbar';
+    const btnBack = document.createElement('button');
+    btnBack.textContent = '← Back';
+    btnBack.onclick = () => { try { window.__mbCellAPI.goBack(); } catch(e) { history.back(); } };
+    const btnFwd = document.createElement('button');
+    btnFwd.textContent = '→ Fwd';
+    btnFwd.onclick = () => { try { window.__mbCellAPI.goForward(); } catch(e) { history.forward(); } };
     const btnRefresh = document.createElement('button');
     btnRefresh.textContent = '⟳ Refresh';
     btnRefresh.onclick = () => { try { window.__mbCellAPI.refresh(); } catch(e) { location.reload(); } };
     const btnStorage = document.createElement('button');
     btnStorage.textContent = '📦 Storage';
     btnStorage.onclick = () => { try { window.__mbCellAPI.viewStorage(); } catch(e) {} };
+    tb.appendChild(btnBack);
+    tb.appendChild(btnFwd);
     tb.appendChild(btnRefresh);
     tb.appendChild(btnStorage);
     (document.body || document.documentElement).appendChild(tb);
@@ -165,9 +176,13 @@ function layoutGrid() {
           const idx = r * gridCols + c;
           const view = cellViews[idx];
           if (!view) continue;
-          const x = c * cellW - sx;
-          const y = r * cellH - sy + TOOLBAR_HEIGHT;
-          view.setBounds({ x, y, width: cellW, height: cellH });
+          const leftBorder = c > 0 ? BORDER_GAP : 0;
+          const topBorder = r > 0 ? BORDER_GAP : 0;
+          const rightShrink = c < gridCols - 1 ? BORDER_GAP : 0;
+          const bottomShrink = r < gridRows - 1 ? BORDER_GAP : 0;
+          const x = c * cellW - sx + leftBorder;
+          const y = r * cellH - sy + TOOLBAR_HEIGHT + topBorder;
+          view.setBounds({ x, y, width: cellW - leftBorder - rightShrink, height: cellH - topBorder - bottomShrink });
         }
       }
     })
@@ -286,6 +301,7 @@ ipcMain.handle("navigate-all", async (e, url) => {
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
     url = "https://" + url;
   }
+  lastUrl = url;
   for (const view of cellViews) {
     view.webContents.loadURL(url).catch(() => {});
   }
@@ -295,6 +311,20 @@ ipcMain.handle("refresh-cell", async (e, r, c) => {
   const idx = r * gridCols + c;
   if (cellViews[idx]) {
     cellViews[idx].webContents.reload();
+  }
+});
+
+ipcMain.handle("go-back", async (e, r, c) => {
+  const idx = r * gridCols + c;
+  if (cellViews[idx] && cellViews[idx].webContents.canGoBack()) {
+    cellViews[idx].webContents.goBack();
+  }
+});
+
+ipcMain.handle("go-forward", async (e, r, c) => {
+  const idx = r * gridCols + c;
+  if (cellViews[idx] && cellViews[idx].webContents.canGoForward()) {
+    cellViews[idx].webContents.goForward();
   }
 });
 
@@ -318,6 +348,11 @@ ipcMain.handle("set-grid-size", async (e, rows, cols) => {
   gridRows = Math.max(1, rows);
   gridCols = Math.max(1, cols);
   buildGrid();
+  if (lastUrl) {
+    for (const view of cellViews) {
+      view.webContents.loadURL(lastUrl).catch(() => {});
+    }
+  }
 });
 
 ipcMain.handle("set-min-size", async (e, w, h) => {
@@ -359,9 +394,13 @@ ipcMain.handle("scroll-changed", async (e, sx, sy) => {
       const idx = r * gridCols + c;
       const view = cellViews[idx];
       if (!view) continue;
-      const x = c * cellW - sx;
-      const y = r * cellH - sy + TOOLBAR_HEIGHT;
-      view.setBounds({ x, y, width: cellW, height: cellH });
+      const leftBorder = c > 0 ? BORDER_GAP : 0;
+      const topBorder = r > 0 ? BORDER_GAP : 0;
+      const rightShrink = c < gridCols - 1 ? BORDER_GAP : 0;
+      const bottomShrink = r < gridRows - 1 ? BORDER_GAP : 0;
+      const x = c * cellW - sx + leftBorder;
+      const y = r * cellH - sy + TOOLBAR_HEIGHT + topBorder;
+      view.setBounds({ x, y, width: cellW - leftBorder - rightShrink, height: cellH - topBorder - bottomShrink });
     }
   }
 });
